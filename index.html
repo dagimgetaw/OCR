@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OCR Converter</title>
+    <link rel="stylesheet" href="/style/style.css" />
+  </head>
+  <body>
+    <h1>OCR File Converter</h1>
+
+    <div class="form-container">
+      <form id="imgForm" enctype="multipart/form-data">
+        <h3>Convert Image to Text</h3>
+        <input type="file" id="imageFile" name="file" accept="image/*" />
+        <button type="button" onclick="convertImage()">Convert Image</button>
+      </form>
+
+      <form id="pdfForm" enctype="multipart/form-data">
+        <h3>Convert PDF to Text</h3>
+        <input type="file" id="pdfFile" name="file" accept="application/pdf" />
+        <button type="button" onclick="convertPdf()">Convert PDF</button>
+      </form>
+    </div>
+
+    <div id="result" style="display: none">
+      <h3>Extracted Text (JSON)</h3>
+      <pre id="jsonResult"></pre>
+    </div>
+
+    <script src="/static/script.js"></script>
+  </body>
+</html>
