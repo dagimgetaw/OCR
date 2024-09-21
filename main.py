@@ -1,45 +1,33 @@
 import pytesseract
 from fastapi import FastAPI, File, UploadFile
-from pdf2image import convert_from_bytes
-from fastapi.responses import JSONResponse
-import cv2
-import numpy as np
-from io import BytesIO
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from image_processing import ocr_image, extract_table_from_img
+from pdf_processing import ocr_pdf, extract_table_from_pdf
 
-
+# Set tesseract executable path for Windows
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# OCR function for images
-def ocr_image(image_data: bytes) -> str:
-    np_img = np.frombuffer(image_data, np.uint8)
-    img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
-    text = pytesseract.image_to_string(img)
-    return text
+@app.get("/")
+async def read_index():
+    return FileResponse("index.html")
 
-# OCR function for PDFs
-def ocr_pdf(pdf_data: bytes) -> str:
-    images = convert_from_bytes(pdf_data)
-    extracted_text = ""
-    for image in images:
-        text = pytesseract.image_to_string(image)
-        extracted_text += text + "\n"
-    return extracted_text
-
-# Route for image OCR
 @app.post("/ocr-image/")
 async def ocr_image_upload(file: UploadFile = File(...)):
     image_data = await file.read()
     extracted_text = ocr_image(image_data)
-    return JSONResponse(content={"text": extracted_text})
+    tables = extract_table_from_img(image_data)
+    return JSONResponse(content={"text": extracted_text, "tables": tables})
 
-# Route for PDF OCR
 @app.post("/ocr-pdf/")
 async def ocr_pdf_upload(file: UploadFile = File(...)):
     pdf_data = await file.read()
+    tables = extract_table_from_pdf(pdf_data)
     extracted_text = ocr_pdf(pdf_data)
-    return JSONResponse(content={"text": extracted_text})
+    return JSONResponse(content={"text": extracted_text, "tables": tables})
 
 if __name__ == "__main__":
     import uvicorn
