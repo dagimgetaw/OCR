@@ -104,10 +104,8 @@ Ensure you have the following installed on your system:
 2.  **Set Up a Virtual Environment (Optional but Recommended)**:
     Create a virtual environment to manage dependencies
 
-        ```bash
-        python -m venv venv
+    `python -m venv venv`
 
-.
 Activate the virtual environment:
 
 - For Windows:` venv\Scripts\activate`
